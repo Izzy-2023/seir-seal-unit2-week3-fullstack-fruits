@@ -42,3 +42,8 @@ const fruitsSchema = new Schema({
 // make fruit model
 const Fruit = model("Fruit", fruitsSchema)
 
+//***********************************************
+// Create our Express Application Object
+//*********************************************** 
+const app = express()
+
