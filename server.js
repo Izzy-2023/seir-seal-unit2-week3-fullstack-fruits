@@ -47,3 +47,64 @@ const Fruit = model("Fruit", fruitsSchema)
 //*********************************************** 
 const app = express()
 
+//*********************************
+// Middleware
+//********************************* 
+app.use(morgan("dev")) //logging
+app.use(methodOverride("_method")) // override for put and delete requests from forms
+app.use(express.urlencoded({extended: true})) // parse urlencoded request bodies
+app.use(express.static("public")) // serve files from public statically
+
+//*********************************
+// Routes
+//********************************* 
+app.get("/", (req, res) => {
+    res.send("your server is running... better catch it.")
+})
+
+app.get("/fruits/seed", async (req, res) => {
+
+    try{
+        // array of starter fruits
+        const startFruits = [
+          { name: "Orange", color: "orange", readyToEat: false },
+          { name: "Grape", color: "purple", readyToEat: false },
+          { name: "Banana", color: "orange", readyToEat: false },
+          { name: "Strawberry", color: "red", readyToEat: false },
+          { name: "Coconut", color: "brown", readyToEat: false },
+          ]
+  
+       // Delete all fruits
+       await Fruit.deleteMany({})
+    
+       // Seed Starter Fruits
+       const fruits = await Fruit.create(startFruits)
+    
+       // send created fruits as response to confirm creation
+       res.json(fruits);
+    } catch(error) {
+      console.log(error.message)
+      res.status(400).send(error.message)
+    }
+  });
+
+  // Index Route Get -> /fruits
+app.get("/fruits", async (req, res) => {
+    try {
+      const fruits = await Fruit.find({});
+      // render a template
+      // fruits /index.ejs = views/fruits/index.ejs
+      res.render("fruits/index.ejs", { fruits });
+    } catch (error) {
+        console.log("---------", error.message, "----------")
+      res.status(400).send(error.message);
+    }
+  });
+  
+  
+
+//********************************** 
+// Server Listener
+//********************************** 
+const PORT = process.env.PORT
+app.listen(PORT, () => console.log(`Now Listening on port ${PORT}`))
